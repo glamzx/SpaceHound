@@ -257,7 +257,7 @@ function drawLine(ctx, points, scale, t = 1) {
   points.forEach((p, i) => {
     const x = xToPx(p.alt);
     const y = yToPx(p.risk);
-    const yy = lerp((ctx.canvas?.clientHeight || 220) - 28, y, t); // animate from bottom-ish
+    const yy = lerp((ctx.canvas?.clientHeight || 220) - 28, y, t);
     if (i === 0) ctx.moveTo(x, yy);
     else ctx.lineTo(x, yy);
   });
@@ -362,12 +362,10 @@ async function runAnalysis() {
 
     const bestRisk = Number(data?.best_option?.risk_score ?? 0);
 
-    // Overall risk (already normalized 0..1 by backend)
     const overallRisk = Number(data?.risk_score ?? bestRisk);
     setScore(overallRisk);
     setBars(overallRisk);
 
-    // Risk level + explanation
     const pill = $('riskLevelPill');
     if (pill) {
       const lvl = (data?.risk_level || "").toUpperCase() || (overallRisk < 0.12 ? "LOW" : overallRisk < 0.28 ? "MEDIUM" : "HIGH");
@@ -755,17 +753,9 @@ function initViewer(container) {
 
 'use strict';
 
-// ======================================================
-// SpaceHound — LeoLabs-style 3D (NO BACKEND)
-// - Earth texture
-// - 200–500 satellites (Points)
-// - Highlight by NORAD ID
-// - Orbit track (Line) for selected satellite
-// - Status overlay + CelesTrak fetch fallback
-// ======================================================
 
 const TLE_PRIMARY = "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle";
-const TLE_FALLBACK_LOCAL = "./tle_fallback.txt"; // опционально: можешь добавить файл локально
+const TLE_FALLBACK_LOCAL = "./tle_fallback.txt";
 
 let state = {
   scene: null,
@@ -774,13 +764,13 @@ let state = {
   earth: null,
   satsPoints: null,
   satsGeom: null,
-  satsPositions: null, // Float32Array
-  satList: [],         // {id,name,l1,l2,satrec, idx}
+  satsPositions: null,
+  satList: [],
   orbitLine: null,
   highlight: null,
   statusEl: null,
   lastSelected: null,
-  kmToUnits: 1 / 6371,   // Earth radius km -> 1 unit
+  kmToUnits: 1 / 6371,
   maxSats: 350,
 };
 
@@ -864,13 +854,11 @@ function init3D(container) {
   container.appendChild(renderer.domElement);
   ensureStatus(container);
 
-  // lights
   scene.add(new THREE.AmbientLight(0xffffff, 0.95));
   const dir = new THREE.DirectionalLight(0xffffff, 0.65);
   dir.position.set(6, 3, 5);
   scene.add(dir);
 
-  // Earth (texture)
   const earthGeom = new THREE.SphereGeometry(1, 96, 96);
   const earthMat = new THREE.MeshStandardMaterial({
     color: 0x0b1228,
@@ -881,14 +869,12 @@ function init3D(container) {
   const earth = new THREE.Mesh(earthGeom, earthMat);
   scene.add(earth);
 
-  // Glow
   const glow = new THREE.Mesh(
     new THREE.SphereGeometry(1.03, 96, 96),
     new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: 0.06 })
   );
   scene.add(glow);
 
-  // Stars (cheap)
   const starCount = 900;
   const starGeom = new THREE.BufferGeometry();
   const starPos = new Float32Array(starCount * 3);
@@ -905,7 +891,6 @@ function init3D(container) {
   const stars = new THREE.Points(starGeom, starMat);
   scene.add(stars);
 
-  // Highlight sphere
   const highlight = new THREE.Mesh(
     new THREE.SphereGeometry(0.03, 16, 16),
     new THREE.MeshBasicMaterial({ color: 0xff4d6d })
@@ -913,10 +898,8 @@ function init3D(container) {
   highlight.visible = false;
   scene.add(highlight);
 
-  // Orbit line holder
   let orbitLine = null;
 
-  // mouse rotate (LeoLabs vibe)
   let isDown = false, px = 0, py = 0;
   renderer.domElement.addEventListener("mousedown", (e) => { isDown = true; px = e.clientX; py = e.clientY; });
   window.addEventListener("mouseup", () => { isDown = false; });
@@ -929,7 +912,6 @@ function init3D(container) {
     scene.rotation.x += dy;
   });
 
-  // resize
   window.addEventListener("resize", () => {
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
@@ -950,10 +932,8 @@ function init3D(container) {
   state.highlight = highlight;
   state.orbitLine = orbitLine;
 
-  // Load earth texture async
   try {
     const loader = new THREE.TextureLoader();
-    // стабильная публичная текстура (three.js examples)
     loader.load(
       "https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg",
       (tex) => {
@@ -963,7 +943,7 @@ function init3D(container) {
         setStatus("Earth texture loaded ✅<br>Loading satellites…");
       },
       undefined,
-      () => { /* если не загрузилась — ничего страшного */ }
+      () => {  }
     );
   } catch (_) { }
 
@@ -972,11 +952,10 @@ function init3D(container) {
 
 function buildSatPoints(count) {
   const geom = new THREE.BufferGeometry();
-  const arr = new Float32Array(count * 3); // xyz per satellite
+  const arr = new Float32Array(count * 3);
   geom.setAttribute("position", new THREE.BufferAttribute(arr, 3));
   geom.computeBoundingSphere();
 
-  // PointsMaterial: делаем заметные точки
   const mat = new THREE.PointsMaterial({
     size: 3.0,
     sizeAttenuation: false,
@@ -1009,7 +988,6 @@ function updateSatPositions() {
     const s = state.satList[i];
     const pv = satellite.propagate(s.satrec, now);
     if (!pv.position) {
-      // у редких бывает NaN — отправим далеко, чтобы не мешало
       state.satsPositions[i * 3 + 0] = 999;
       state.satsPositions[i * 3 + 1] = 999;
       state.satsPositions[i * 3 + 2] = 999;
@@ -1033,7 +1011,6 @@ function drawOrbitTrack(noradId) {
   const s = state.satList.find(x => x.id === String(noradId));
   if (!s) return;
 
-  // remove previous
   if (state.orbitLine) {
     state.scene.remove(state.orbitLine);
     state.orbitLine.geometry.dispose();
@@ -1041,10 +1018,9 @@ function drawOrbitTrack(noradId) {
     state.orbitLine = null;
   }
 
-  // sample future track ~ 90 minutes
   const now = new Date();
   const pts = [];
-  for (let t = 0; t <= 90 * 60; t += 60) { // every 60 sec
+  for (let t = 0; t <= 90 * 60; t += 60) {
     const dt = new Date(now.getTime() + t * 1000);
     const pv = satellite.propagate(s.satrec, dt);
     if (!pv.position) continue;
@@ -1095,7 +1071,6 @@ async function loadSatellites() {
   try {
     text = await fetchText(TLE_PRIMARY);
   } catch (e) {
-    // fallback local file (optional)
     source = "local fallback";
     try {
       text = await fetchText(TLE_FALLBACK_LOCAL);
@@ -1120,7 +1095,6 @@ async function loadSatellites() {
     return;
   }
 
-  // build satrec list
   state.satList = list.map((t, idx) => ({
     ...t,
     idx,
@@ -1128,7 +1102,6 @@ async function loadSatellites() {
     lastPos: null
   }));
 
-  // create points geometry
   buildSatPoints(state.satList.length);
 
   setStatus(
@@ -1137,7 +1110,6 @@ async function loadSatellites() {
     `Tip: type <b>25544</b> and press Find`
   );
 
-  // update loop
   updateSatPositions();
   setInterval(updateSatPositions, 1200);
 }
