@@ -9,7 +9,11 @@ from typing import Any, Dict, List, Optional, Tuple
 import joblib
 import numpy as np
 import pandas as pd
-from fastapi import Body, FastAPI, Query
+from fastapi import Body, FastAPI, Query, UploadFile, File
+import tempfile
+import json
+from google import genai
+
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, confloat
@@ -27,8 +31,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 MODEL_PATH = os.getenv("MODEL_PATH", "orbit_model.pkl")
 model = joblib.load(MODEL_PATH)
+
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyC41xj0Z_i08RraM7KmY4GnSgDEsp_Kkww")
+genai_client = genai.Client(api_key=GEMINI_API_KEY)
+
 
 
 from pydantic import BaseModel, Field
@@ -407,3 +416,50 @@ def generate_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": "attachment; filename=spacehound_report.pdf"},
     )
+
+
+
+@app.post("/analyze_mission_file")
+async def analyze_mission_file(file: UploadFile = File(...)):
+    if not genai_client:
+        return {"error": "Gemini API client not initialized"}
+        
+    ext = os.path.splitext(file.filename)[1]
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
+        content = await file.read()
+        tmp.write(content)
+        tmp_path = tmp.name
+
+    try:
+        uploaded_file = genai_client.files.upload(file=tmp_path)
+        
+        prompt = (
+            "Analyze this satellite mission document. Extract the planned orbit parameters. "
+            "Return ONLY a valid JSON object with exactly two keys: 'altitude' (in km, as a float) "
+            "and 'inclination' (in degrees, as a float). Do not include markdown code block formatting or any extra text. "
+            "If you cannot find an exact number, make a best guess based on the orbit type (e.g. SSO -> ~97.5 inc, ~550 alt). "
+            "Example output: {\"altitude\": 550.0, \"inclination\": 97.5}"
+        )
+        
+        result = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[uploaded_file, prompt]
+        )
+        
+        genai_client.files.delete(name=uploaded_file.name)
+        
+        text = result.text.strip()
+        if text.startswith('```json'):
+            text = text[7:]
+        if text.endswith('```'):
+            text = text[:-3]
+            
+        data = json.loads(text.strip())
+        return data
+        
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)

@@ -8,3 +8,5 @@ sgp4
 numpy
 reportlab
 
+google-genai
+python-multipart
