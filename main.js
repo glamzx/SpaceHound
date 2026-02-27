@@ -2,7 +2,7 @@
 
 'use strict';
 
-const API_BASE = localStorage.getItem("SPACEHOUND_API") || "http://127.0.0.1:8000";
+const API_BASE = "https://spacehound-api.onrender.com";
 
 (function initReveal() {
   const revealEls = document.querySelectorAll('.reveal');
