@@ -35,8 +35,8 @@ app.add_middleware(
 MODEL_PATH = os.getenv("MODEL_PATH", "orbit_model.pkl")
 model = joblib.load(MODEL_PATH)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyC41xj0Z_i08RraM7KmY4GnSgDEsp_Kkww")
-genai_client = genai.Client(api_key=GEMINI_API_KEY)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+genai_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 
 
