@@ -36,7 +36,6 @@ MODEL_PATH = os.getenv("MODEL_PATH", "orbit_model.pkl")
 model = joblib.load(MODEL_PATH)
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-genai_client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 
 
@@ -421,8 +420,11 @@ def generate_pdf(
 
 @app.post("/analyze_mission_file")
 async def analyze_mission_file(file: UploadFile = File(...)):
-    if not genai_client:
-        return {"error": "Gemini API client not initialized"}
+    current_key = os.getenv("GEMINI_API_KEY")
+    if not current_key or len(current_key.strip()) < 10:
+        return {"error": "API Key is not configured correctly on the server."}
+    
+    genai_client = genai.Client(api_key=current_key.strip())
         
     ext = os.path.splitext(file.filename)[1]
     
