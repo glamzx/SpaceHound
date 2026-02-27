@@ -60,15 +60,45 @@ function switchTab(tab) {
   if (target) target.style.display = 'grid';
 }
 
-function simulateUpload() {
+async function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
   const status = document.getElementById('uploadStatus');
   if (!status) return;
 
   status.style.display = 'block';
-  status.textContent = '⏳ Uploading file...';
+  status.style.color = 'var(--muted)';
+  status.textContent = `⏳ Uploading "${file.name}" to AI analyst...`;
 
-  setTimeout(() => { status.textContent = '✅ File uploaded — analyzing...'; }, 1200);
-  setTimeout(runAnalysis, 2200);
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch(`${API_BASE}/analyze_mission_file`, {
+      method: 'POST',
+      body: formData
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || data.error || "Failed to analyze file");
+
+    status.style.color = 'var(--green)';
+    status.textContent = `✅ Analyzed: found Alt ${data.altitude} km, Inc ${data.inclination}°`;
+
+    // Auto-fill the form
+    const altInput = document.getElementById('altInput');
+    const incInput = document.getElementById('incInput');
+    if (altInput && data.altitude) altInput.value = data.altitude;
+    if (incInput && data.inclination) incInput.value = data.inclination;
+
+    // Run the risk analysis automatically
+    setTimeout(runAnalysis, 500);
+
+  } catch (err) {
+    status.style.color = '#ff4d6d';
+    status.textContent = `❌ Error: ${err.message}`;
+  }
 }
 
 
@@ -943,7 +973,7 @@ function init3D(container) {
         setStatus("Earth texture loaded ✅<br>Loading satellites…");
       },
       undefined,
-      () => {  }
+      () => { }
     );
   } catch (_) { }
 
