@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpaceHound — Space Without Waste</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <nav>
+    <div class="logo">
+      <img src=dabeatles.svg alt="SpaceHound Logo" class="logo-icon">
+
+    </div>
+    <ul class="nav-links">
+      <li><a href="#stats">About Us</a></li>
+      <li><a href="#how">Solutions</a></li>
+      <li><a href="#features">Pricing</a></li>
+      <li><a href="#faq">Resources</a></li>
+    </ul>
+    <div class="nav-cta">
+      <button class="btn-ghost">Log in</button>
+      <button class="btn-primary">Join Beta</button>
+    </div>
+  </nav>
+
+  <section id="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-badge">&#128752; Now in Early Access</div>
+    <h1>Space without<br>waste</h1>
+    <p class="hero-sub">
+      A vision for sustainable space exploration. By reducing debris, reusing resources,
+      and designing smarter satellites, we can keep Earth's orbit open and safe for future generations.
+    </p>
+    <div class="satellite-wrap">
+      <div class="orbit-ring">
+        <div class="orbit-dot"></div>
+      </div>
+      <div class="orbit-ring">
+        <div class="orbit-dot red"></div>
+      </div>
+      <div class="orbit-ring">
+        <div class="orbit-dot"></div>
+      </div>
+      <div class="sat-core">&#128752;</div>
+    </div>
+    <div class="hero-btns">
+      <button class="btn-primary btn-large">Publish App</button>
+      <button class="btn-outline btn-large">&#9655; &nbsp;Try it now</button>
+    </div>
+  </section>
+
+  <section id="stats">
+    <div class="container">
+      <span class="section-label">Overcrowded</span>
+      <h2 class="section-title">Space Is Crowded &mdash; and Risky</h2>
+      <p class="section-sub">
+        In the new commercial LEO economy, every failure creates more debris, more cost, and less trust.
+      </p>
+      <div class="stats-grid reveal">
+        <div class="stat-card">
+          <div class="stat-num">41.3<span>%</span></div>
+          <div class="stat-desc">of small satellites experience loss or partial mission failure</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">28<span>%</span></div>
+          <div class="stat-desc">of failures are caused by power system issues</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">&gt;25<span>k</span></div>
+          <div class="stat-desc">tracked objects currently in orbit around Earth</div>
+        </div>
+      </div>
+      <p class="stats-body reveal">
+        CubeSat teams, investors, and insurers need reliable, data-driven risk intelligence &mdash; before launch.
+      </p>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">How SpaceHound Works</span>
+        <h2 class="section-title">Four-step process from mission upload<br>to continuous orbit monitoring</h2>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card reveal">
+          <div class="step-icon blue">&#128203;</div>
+          <span class="step-tag">Upload Mission Data</span>
+          <h4>TLEs, orbital plans, and subsystem specs</h4>
+          <p>Feed mission parameters into our analysis engine for a complete pre-launch assessment.</p>
+        </div>
+        <div class="step-card active reveal">
+          <div class="step-icon purple">&#129302;</div>
+          <span class="step-tag">AI Risk Analyst</span>
+          <h4>Model failure probabilities, subsystem risks, and space weather</h4>
+          <p>Advanced machine learning analyzes thousands of mission data points in real-time.</p>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-icon cyan">&#128274;</div>
+          <span class="step-tag">Certification Engine</span>
+          <h4>Generates Launch Readiness Certificate (PDF + API)</h4>
+          <p>Industry-standard certification trusted by launch providers and insurers globally.</p>
+        </div>
+        <div class="step-card reveal">
+          <div class="step-icon green">&#128225;</div>
+          <span class="step-tag">Ongoing Monitoring</span>
+          <h4>AI orbit updates, debris alerts, and CVE generator</h4>
+          <p>Continuous post-launch monitoring with automated anomaly detection and alerts.</p>
+        </div>
+      </div>
+      <div class="risk-legend reveal">
+        <div class="legend-item"><span class="legend-dot" style="background:var(--red)"></span> High Risk</div>
+        <div class="legend-item"><span class="legend-dot" style="background:var(--green)"></span> Low Risk</div>
+        <p style="color:var(--muted);font-size:.82rem;margin-left:8px">Real-time risk visualization as mission
+          parameters are optimized</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="container">
+      <div class="demo-grid">
+        <div class="upload-box reveal" id="uploadBox">
+          <div class="upload-icon">&#128193;</div>
+          <h4>Upload Mission Data</h4>
+          <p>Browse and choose the files you want to upload from your computer</p>
+          <button class="upload-btn" onclick="simulateUpload()">
+            <span>+</span> Choose Files
+          </button>
+          <div id="uploadStatus" style="margin-top:12px;font-size:.8rem;color:var(--muted);display:none;"></div>
+        </div>
+        <div class="results-panel reveal">
+          <h4>Risk Assessment Results</h4>
+          <div class="score-row">
+            <div>
+              <div class="score-label">Overall Risk Score</div>
+              <div style="font-size:.75rem;color:var(--muted);margin-top:2px">LEO Mission &middot; 550 km</div>
+            </div>
+            <div class="score-val" id="riskScore">7.8%</div>
+          </div>
+
+          <div class="risk-explain">
+            <div class="risk-level-row">
+              <span class="pill" id="riskLevelPill">RISK: —</span>
+            </div>
+            <ul class="risk-reasons" id="riskReasons"></ul>
+            <div class="risk-reco" id="riskRecommendation"></div>
+          </div>
+
+          <div class="score-bar-wrap">
+            <div class="score-bar-label"><span>Orbital Availability</span><span style="color:var(--green)">0.9540</span>
+            </div>
+            <div class="score-bar-bg">
+              <div class="score-bar-fill fill-green" style="width:95%"></div>
+            </div>
+          </div>
+          <div class="score-bar-wrap">
+            <div class="score-bar-label"><span>Power System Risk</span><span style="color:#f5c842">4%</span></div>
+            <div class="score-bar-bg">
+              <div class="score-bar-fill fill-yellow" style="width:30%"></div>
+            </div>
+          </div>
+          <div class="score-bar-wrap">
+            <div class="score-bar-label"><span>Communication Risk</span><span style="color:var(--red)">9%</span></div>
+            <div class="score-bar-bg">
+              <div class="score-bar-fill fill-red" style="width:45%"></div>
+            </div>
+          </div>
+          <div class="score-bar-wrap">
+            <div class="score-bar-label"><span>Debris Conjunction</span><span style="color:var(--blue)">2%</span></div>
+            <div class="score-bar-bg">
+              <div class="score-bar-fill fill-blue" style="width:18%"></div>
+            </div>
+          </div>
+          <div class="orbit-inputs">
+            <div class="orbit-field">
+              <label>Planned Altitude (km)</label>
+              <input id="altInput" type="number" placeholder="e.g., 550" min="150" max="2000">
+            </div>
+
+            <div class="orbit-field">
+              <label>Inclination (°)</label>
+              <input id="incInput" type="number" placeholder="e.g., 97" min="0" max="180" step="0.1">
+            </div>
+
+            <div class="orbit-field">
+              <label>Launch date</label>
+              <input id="launchDate" type="date">
+            </div>
+
+            <div class="orbit-field">
+              <label>Mission duration (days)</label>
+              <input id="missionDays" type="number" placeholder="e.g., 365" min="1" max="3650">
+            </div>
+          </div>
+
+          <div class="orbit-chart-wrap">
+            <div class="orbit-chart-title">Risk vs Altitude</div>
+            <canvas id="riskChart" width="820" height="220"></canvas>
+          </div>
+
+          <div id="orbitRecs" class="orbit-recs">
+            <div class="orbit-hint">Enter mission parameters and click “Run Risk Analysis”.</div>
+          </div>
+          <button class="upload-btn" style="margin-top:20px;width:100%;justify-content:center;" onclick="runAnalysis()">
+            Run Risk Analysis &rarr;
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="panel-actions">
+  </div>
+  <div id="orbit3D" style="width:100%;height:400px;"></div>
+  <div class="viz-card">
+    <div class="viz-title">LEO Satellite Density Viewer</div>
+    <div style="display:flex;gap:10px;margin-bottom:10px;">
+      <input id="noradSearch" placeholder="Enter NORAD ID (e.g. 25544)"
+        style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:#0f1a30;color:white;">
+      <button onclick="highlightSatellite()"
+        style="padding:8px 14px;border-radius:8px;background:#2d6af6;color:white;border:none;">
+        Find
+      </button>
+    </div>
+    <div id="orbit3D" class="orbit3d"></div>
+    <div class="viz-note">Live TLE (CelesTrak) + SGP4 in browser</div>
+  </div>
+
+  <section id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Features</span>
+        <h2 class="section-title">Comprehensive risk management tools<br>for the entire mission lifecycle</h2>
+        <p class="section-sub">Everything your team needs from pre-launch assessment to on-orbit anomaly detection.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <div class="feat-icon c1">&#128302;</div>
+          <h4>Pre-launch Risk Assessment</h4>
+          <p>Comprehensive analysis of mission parameters and launch probabilities before commitment using historical
+            mission data (PDF + API templates).</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon c2">&#128202;</div>
+          <h4>Debris Conjunction Tracking</h4>
+          <p>Real-time monitoring of conjunction events with collision avoidance scheduling and automated alerts for
+            operators.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon c3">&#129504;</div>
+          <h4>ML Driven Failure Prediction</h4>
+          <p>Machine learning models trained on thousands of mission datasets to predict subsystem failures before they
+            occur.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon c4">&#9989;</div>
+          <h4>Launch Readiness Certification</h4>
+          <p>Trusted certificates for launch providers, underwriters, and insurance companies. Standardized and
+            industry-recognized.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon c5">&#128279;</div>
+          <h4>Insurance API Integration</h4>
+          <p>Direct integration with insurance providers to automate risk underwriting, reduce manual data input, and
+            speed up policies.</p>
+        </div>
+        <div class="feature-card reveal">
+          <div class="feat-icon c6">&#128225;</div>
+          <h4>Live Monitoring Dashboard</h4>
+          <p>Continuous on-orbit telemetry analysis, live anomaly detection, and AI-generated corrective action plans
+            for operators.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="serve">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Who We Serve</span>
+        <h2 class="section-title">Trusted by mission operators,<br>financiers, and insurers</h2>
+      </div>
+      <div class="serve-tabs">
+        <button class="serve-tab active" onclick="switchTab('operators')">Satellite Operators</button>
+        <button class="serve-tab" onclick="switchTab('investors')">Investors</button>
+        <button class="serve-tab" onclick="switchTab('insurance')">Insurance Companies</button>
+      </div>
+
+      <div class="serve-grid" id="tab-operators">
+        <div class="serve-card active">
+          <h4>Satellite Operators</h4>
+          <p>Validate your design, reduce risk, ensure mission success.</p>
+          <ul class="serve-list">
+            <li>Pre-launch risk validation</li>
+            <li>Design optimization recommendations</li>
+            <li>Insurance certification</li>
+            <li>Ongoing mission monitoring</li>
+          </ul>
+        </div>
+        <div class="serve-card active highlighted">
+          <h4>Mission Teams</h4>
+          <p>Collaborate across disciplines with real-time data sharing.</p>
+          <ul class="serve-list">
+            <li>Multi-user team dashboards</li>
+            <li>Version-controlled mission files</li>
+            <li>Risk timeline visualization</li>
+            <li>Automated report generation</li>
+          </ul>
+        </div>
+        <div class="serve-card active">
+          <h4>Launch Providers</h4>
+          <p>Screen payloads and reduce integration risk across manifests.</p>
+          <ul class="serve-list">
+            <li>Payload risk screening</li>
+            <li>Manifest risk analysis</li>
+            <li>Certification verification</li>
+            <li>On-pad anomaly alerts</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="serve-grid" id="tab-investors" style="display:none;">
+        <div class="serve-card" style="display:block;">
+          <h4>Investors</h4>
+          <p>Quantify risk before funding. Reduce surprises after launch.</p>
+          <ul class="serve-list">
+            <li>Objective risk scores</li>
+            <li>Mission viability assessment</li>
+            <li>Portfolio risk analysis</li>
+            <li>Data-driven due diligence</li>
+          </ul>
+        </div>
+        <div class="serve-card highlighted" style="display:block;">
+          <h4>VC &amp; PE Funds</h4>
+          <p>Standardized mission scoring across your space portfolio.</p>
+          <ul class="serve-list">
+            <li>Comparative mission metrics</li>
+            <li>Automated reporting</li>
+            <li>Historical success benchmarks</li>
+            <li>Risk-adjusted projections</li>
+          </ul>
+        </div>
+        <div class="serve-card" style="display:block;">
+          <h4>Government Agencies</h4>
+          <p>Independent assessments for national space programs.</p>
+          <ul class="serve-list">
+            <li>Regulatory compliance checks</li>
+            <li>Debris mitigation scoring</li>
+            <li>Cross-mission data sharing</li>
+            <li>Classified-ready API</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="serve-grid" id="tab-insurance" style="display:none;">
+        <div class="serve-card" style="display:block;">
+          <h4>Underwriters</h4>
+          <p>Standardize risk across policies with objective mission data.</p>
+          <ul class="serve-list">
+            <li>Standardized risk metrics</li>
+            <li>Automated underwriting aids</li>
+            <li>Real-time mission monitoring</li>
+            <li>Claims validation support</li>
+          </ul>
+        </div>
+        <div class="serve-card highlighted" style="display:block;">
+          <h4>Insurance Carriers</h4>
+          <p>Expand into NewSpace with the data you need to price fairly.</p>
+          <ul class="serve-list">
+            <li>Mission risk benchmarking</li>
+            <li>API-first data integration</li>
+            <li>Portfolio-level dashboards</li>
+            <li>Claims intelligence system</li>
+          </ul>
+        </div>
+        <div class="serve-card" style="display:block;">
+          <h4>Reinsurers</h4>
+          <p>Aggregate and model risk exposure across global space missions.</p>
+          <ul class="serve-list">
+            <li>Global LEO risk map</li>
+            <li>Catastrophe modeling</li>
+            <li>Mission interdependency analysis</li>
+            <li>Regulatory reporting tools</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container">
+      <h2 class="reveal">Answers to our frequently<br>asked questions</h2>
+      <div class="faq-list">
+
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How does SpaceHound actually predict satellite failures?
+            <span class="faq-arrow">+</span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">SpaceHound uses ML models trained on data from thousands of historical LEO missions
+              combined with real-time telemetry, space weather feeds, and subsystem-level sensor data. Our failure
+              prediction engine identifies early anomaly signatures across power, thermal, communication, and propulsion
+              subsystems, often days or weeks before a failure manifests.</div>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-q open" onclick="toggleFaq(this)">
+            Why would launch providers or insurers trust your certification?
+            <span class="faq-arrow"
+              style="transform:rotate(45deg);border-color:var(--blue);background:rgba(45,106,246,.15)">+</span>
+          </button>
+          <div class="faq-a open">
+            <div class="faq-a-inner">We partner with major launch and insurance firms, making SpaceHound's data-backed
+              certification a trusted standard for launch approval. Our methodology is transparent, auditable, and built
+              on the same mission data standards used by ESA and NASA. Insurers and providers benefit from consistent,
+              independent third-party verification that reduces underwriting uncertainty.</div>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How is this different from existing space-tracking tools?
+            <span class="faq-arrow">+</span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">Existing tools like Space-Track or LeoLabs focus on debris tracking and collision
+              avoidance. SpaceHound goes further: we provide mission-level risk intelligence across the full lifecycle
+              &mdash; from design review to on-orbit anomaly response &mdash; and deliver that intelligence in formats
+              operators, investors, and insurers can all use directly.</div>
+          </div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How will SpaceHound make money long-term?
+            <span class="faq-arrow">+</span>
+          </button>
+          <div class="faq-a">
+            <div class="faq-a-inner">SpaceHound operates on a SaaS subscription model with tiers for operators,
+              investors, and insurers. We also offer enterprise API access for large-scale integrations and a
+              certification marketplace where operators can receive verified Launch Readiness Certificates. Long-term,
+              we plan to offer actuarial data licensing to the insurance market.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="logo"><span class="logo-dot"></span>SpaceHound</div>
+          <p>Mission intelligence for the new space economy. Reducing debris. Enabling trust.</p>
+          <div class="footer-swirl">&infin;</div>
+        </div>
+        <div class="footer-col">
+          <h5>Links</h5>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Solutions</a></li>
+            <li><a href="#">Pricing</a></li>
+            <li><a href="#">Resources</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Legal</h5>
+          <ul>
+            <li><a href="#">EULA &amp; TC</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Security</a></li>
+            <li><a href="#">Cookie Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>Contact</h5>
+          <ul>
+            <li><a href="mailto:hello@spacehound.io">hello@spacehound.io</a></li>
+            <li><a href="#">API Docs</a></li>
+            <li><a href="#">Status Page</a></li>
+            <li><a href="#">Press Kit</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 SpaceHound Inc. All rights reserved.</span>
+        <span>Made for the future of space &#128752;</span>
+      </div>
+    </div>
+  </footer>
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/satellite.js/1.3.0/satellite.min.js"></script>
+  <script src="main.js"></script>
+
+</body>
+
+</html>
