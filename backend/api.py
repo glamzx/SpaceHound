@@ -14,18 +14,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, confloat
 
-# PDF
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 
 
 app = FastAPI(title="SpaceHound API", version="1.1.0")
 
-# -------------------------------
-# CORS
-# -------------------------------
-# In production, replace "*" with your GitHub Pages domain:
-# e.g. ["https://<username>.github.io"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -33,16 +27,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -------------------------------
-# Load ML model
-# -------------------------------
 MODEL_PATH = os.getenv("MODEL_PATH", "orbit_model.pkl")
 model = joblib.load(MODEL_PATH)
 
 
-# ===============================
-# Request/Response Models
-# ===============================
 from pydantic import BaseModel, Field
 from typing import Optional
 
@@ -53,33 +41,21 @@ class OrbitRequest(BaseModel):
     mission_days: Optional[int] = Field(None, ge=1, le=3650, description="Optional mission duration (days)")
 
 
-# ===============================
-# Helpers
-# ===============================
 def _gaussian(x: float, mu: float, sigma: float) -> float:
     return math.exp(-0.5 * ((x - mu) / sigma) ** 2)
 
 
 def calculate_congestion(altitude_km: float, inclination_deg: float) -> float:
-    """
-    Simplified congestion estimator (0..1).
-    - Peaks around common operational shells (e.g. ~550 km).
-    - Adds extra congestion for SSO-like inclinations (~97–99°).
-    """
-    # Base congestion
     base = 0.18
 
-    # Peaks (tuned to feel realistic for demos; replace with real density later)
     peak_550 = 0.65 * _gaussian(altitude_km, 550, 35)
     peak_600 = 0.30 * _gaussian(altitude_km, 600, 40)
     peak_450 = 0.15 * _gaussian(altitude_km, 450, 45)
 
-    # Inclination factor: SSO band tends to be busier
     sso_boost = 0.0
     if abs(inclination_deg - 97.5) <= 2.0:
         sso_boost = 0.18
     elif abs(inclination_deg - 53.0) <= 2.0:
-        # common Starlink-like inclination band
         sso_boost = 0.10
 
     congestion = base + peak_550 + peak_600 + peak_450 + sso_boost
@@ -87,10 +63,6 @@ def calculate_congestion(altitude_km: float, inclination_deg: float) -> float:
 
 
 def estimate_relative_velocity(altitude_km: float, inclination_deg: float) -> float:
-    """
-    Simplified relative velocity estimate (km/s).
-    Used as a proxy feature for collision likelihood due to crossing traffic.
-    """
     base = 7.45
     inc_term = 0.0045 * abs(inclination_deg - 98.0)
     alt_term = 0.0009 * abs(altitude_km - 550.0)
@@ -99,9 +71,6 @@ def estimate_relative_velocity(altitude_km: float, inclination_deg: float) -> fl
 
 
 def _model_predict_raw(altitude_km: float, inclination_deg: float) -> Tuple[float, Dict[str, float]]:
-    """
-    Returns (raw_model_output, features_used).
-    """
     congestion = calculate_congestion(altitude_km, inclination_deg)
     rel_vel = estimate_relative_velocity(altitude_km, inclination_deg)
 
@@ -112,7 +81,6 @@ def _model_predict_raw(altitude_km: float, inclination_deg: float) -> Tuple[floa
         "relative_velocity": float(rel_vel),
     }])
 
-    # Support different sklearn model types
     raw: float
     if hasattr(model, "predict_proba"):
         raw = float(model.predict_proba(df)[0][1])
@@ -125,20 +93,12 @@ def _model_predict_raw(altitude_km: float, inclination_deg: float) -> Tuple[floa
 
 
 def normalize_risk(raw: float) -> float:
-    """
-    Normalize risk to 0..1.
-    - If already looks like probability: keep it.
-    - If decision_function-like: sigmoid.
-    - If regressor-like (SpaceHound synthetic training): robust min-max + clipping.
-    """
     if 0.0 <= raw <= 1.0:
         return float(raw)
 
-    # If it looks like a logit/score around 0, use sigmoid
     if -10.0 <= raw <= 10.0:
         return float(1.0 / (1.0 + math.exp(-raw)))
 
-    # Regressor output: expected range ~0.3..1.3 in your synthetic function
     lo, hi = 0.25, 1.35
     norm = (raw - lo) / (hi - lo)
     return float(max(0.0, min(1.0, norm)))
@@ -162,13 +122,11 @@ def build_reasons(altitude_km: float, inclination_deg: float, feats: Dict[str, f
     elif cong >= 0.50:
         reasons.append("Орбитальная загруженность выше среднего на этой высоте.")
 
-    # Busy shells
     if 530 <= altitude_km <= 580:
         reasons.append("Высота находится близко к плотной LEO-оболочке (~550 км), где много активных спутников.")
     if 590 <= altitude_km <= 640:
         reasons.append("Диапазон 600–640 км часто имеет пересекающийся трафик и среднюю/высокую плотность миссий.")
 
-    # Inclination bands
     if abs(inclination_deg - 97.5) <= 2.0:
         reasons.append("Наклонение близко к SSO (97–99°): такие орбиты часто пересекаются и перегружены.")
     elif abs(inclination_deg - 53.0) <= 2.0:
@@ -182,7 +140,6 @@ def build_reasons(altitude_km: float, inclination_deg: float, feats: Dict[str, f
     if not reasons and score01 >= 0.66:
         reasons.append("Комбинация параметров создаёт повышенную вероятность пересечений с другими орбитальными плоскостями.")
 
-    # Keep it short
     return reasons[:3]
 
 
@@ -220,7 +177,6 @@ def build_recommendation_text(
             f"По оценке системы, более безопасный вариант сейчас: {best['altitude']} км / {best['inclination']}°."
         )
 
-    # HIGH
     actions = []
     if cong >= 0.75 or (530 <= altitude_km <= 580):
         actions.append("изменить высоту на 30–100 км, чтобы уйти из плотной оболочки")
@@ -288,9 +244,6 @@ def score_option(alt: float, inc: float) -> Dict[str, Any]:
     }
 
 
-# ===============================
-# Routes
-# ===============================
 @app.get("/")
 def root():
     return {"message": "SpaceHound Orbit Recommendation AI Running", "model_path": MODEL_PATH}
@@ -303,9 +256,7 @@ def health():
 
 @app.post("/recommend_orbit")
 def recommend_orbit(
-    # Accept JSON body (preferred)
     payload: Optional[OrbitRequest] = Body(default=None),
-    # Also accept query params for backward compatibility
     altitude: Optional[float] = Query(default=None),
     inclination: Optional[float] = Query(default=None),
     launch_date: Optional[str] = Query(default=None),
@@ -320,11 +271,9 @@ def recommend_orbit(
     if altitude is None or inclination is None:
         return {"error": "altitude and inclination are required (JSON body or query params)"}
 
-    # Score the requested orbit
     raw0, feats0 = _model_predict_raw(altitude, inclination)
     score0 = normalize_risk(raw0)
 
-    # Generate realistic options (grid-search around input)
     candidates = [score_option(a, i) for (a, i) in generate_candidate_grid(altitude, inclination)]
     candidates_sorted = sorted(candidates, key=lambda x: x["risk_score"])
     top = _diverse_top_k(candidates_sorted, k=3)
@@ -372,8 +321,6 @@ def density(
     alt_min: int = Query(300),
     alt_max: int = Query(900),
 ):
-    # Still a simplified generator for visualization demos.
-    # Replace with real data/TLE-based density when you add a database.
     import random
 
     points = []
