@@ -784,7 +784,7 @@ function initViewer(container) {
 'use strict';
 
 
-const TLE_PRIMARY = "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle";
+const TLE_PRIMARY = `${API_BASE}/tle`;
 const TLE_FALLBACK_LOCAL = "./tle_fallback.txt";
 
 let state = {

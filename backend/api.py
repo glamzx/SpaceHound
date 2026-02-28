@@ -465,3 +465,19 @@ async def analyze_mission_file(file: UploadFile = File(...)):
     finally:
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+
+from fastapi import Response
+import urllib.request
+@app.get("/tle")
+def get_tle_proxy():
+    try:
+        req = urllib.request.Request(
+            "https://celestrak.org/NORAD/elements/gp.php?GROUP=active&FORMAT=tle",
+            headers={'User-Agent': 'Mozilla/5.0'}
+        )
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = response.read()
+        return Response(content=data, media_type="text/plain")
+    except Exception as e:
+        return Response(content=f"Error fetching TLE: {str(e)}", status_code=500, media_type="text/plain")
