@@ -801,7 +801,7 @@ let state = {
   statusEl: null,
   lastSelected: null,
   kmToUnits: 1 / 6371,
-  maxSats: 350,
+  maxSats: 2500,
 };
 
 function $(id) { return document.getElementById(id); }
