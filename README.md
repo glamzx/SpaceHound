@@ -9,6 +9,34 @@ SpaceHound is an advanced mission intelligence platform for the new space econom
 - **3D Satellite Density Viewer**: Real-time rendering of active LEO satellites powered by CelesTrak TLE feeds and SGP4 orbital propagation algorithms, visualized in a high-performance WebGL environment.
 - **Dynamic Risk Charting**: Visually models the correlation between payload operating altitude, inclination constraints, and failure rate.
 
+### Example Mission Data (For Risk Analysis)
+To test the AI risk analysis, you can save the following text into a `.txt` file and upload it on the **Analysis** page:
+
+```text
+Mission Data Satellite
+
+Satellite Name: Orbita-X1
+Mission Type: Earth Observation
+Launch Date: 20.12.2028
+Launch Site: Baikonur Cosmodrome, Kazakhstan
+Operator: AstroTech Space
+Manufacturer: AstroTech Industries
+Orbit Type: Low Earth Orbit (LEO)
+Altitude: 400 km
+Inclination: 51.6°
+Orbital Period: 92 minutes
+Mission Duration: 5 years
+Mass: 480 kg
+Power Supply: Solar Panels + Lithium-Ion Battery
+Payload: Multispectral Camera, Thermal Sensor, Communication Module
+Communication Frequency: X-Band / S-Band
+Data Transmission Rate: 250 Mbps
+Coverage Area: Central Asia and nearby regions
+Average Revisit Time: 12 hours
+Status: Planned
+Purpose: Monitoring weather, land use, and environmental changes
+```
+
 ---
 
 ## 🛠 How to Launch Locally
