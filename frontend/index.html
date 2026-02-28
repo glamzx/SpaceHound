@@ -16,18 +16,18 @@
 
   <nav>
     <div class="logo">
-      <img src=dabeatles.svg alt="SpaceHound Logo" class="logo-icon">
-
+      <img src="dabeatles.svg" alt="da beatles logo*" class="logo-icon">
+      <span style="margin-left:8px; font-weight:600;">| SpaceHound</span>
     </div>
     <ul class="nav-links">
       <li><a href="#stats">About Us</a></li>
       <li><a href="#how">Solutions</a></li>
-      <li><a href="app.html">Pricing</a></li>
+      <li><a href="app.html">Analysis</a></li>
       <li><a href="#faq">Resources</a></li>
     </ul>
     <div class="nav-cta">
       <button class="btn-ghost">Log in</button>
-      <button class="btn-primary">Join Beta</button>
+      <button class="btn-primary">Sign Up</button>
     </div>
   </nav>
 
@@ -126,17 +126,6 @@
       </div>
     </div>
   </section>
-
-  <div style="display:flex;gap:10px;margin-bottom:10px;">
-    <input id="noradSearch" placeholder="Enter NORAD ID (e.g. 25544)"
-      style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:#0f1a30;color:white;">
-    <button onclick="highlightSatellite()"
-      style="padding:8px 14px;border-radius:8px;background:#2d6af6;color:white;border:none;">
-      Find
-    </button>
-  </div>
-  <div class="viz-note">Live TLE (CelesTrak) + SGP4 in browser</div>
-  </div>
 
   <section id="features">
     <div class="container">
@@ -318,12 +307,11 @@
         </div>
 
         <div class="faq-item reveal">
-          <button class="faq-q open" onclick="toggleFaq(this)">
+          <button class="faq-q" onclick="toggleFaq(this)">
             Why would launch providers or insurers trust your certification?
-            <span class="faq-arrow"
-              style="transform:rotate(45deg);border-color:var(--blue);background:rgba(45,106,246,.15)">+</span>
+            <span class="faq-arrow">+</span>
           </button>
-          <div class="faq-a open">
+          <div class="faq-a">
             <div class="faq-a-inner">We partner with major launch and insurance firms, making SpaceHound's data-backed
               certification a trusted standard for launch approval. Our methodology is transparent, auditable, and built
               on the same mission data standards used by ESA and NASA. Insurers and providers benefit from consistent,
