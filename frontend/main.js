@@ -456,7 +456,7 @@ async function runAnalysis() {
     await initOrUpdate3D();
 
   } catch (err) {
-    setHint(`Failed to fetch from AI. <br><span style="opacity:.85">Check that FastAPI is running at ${API_BASE} and open the site via Live Server.</span><br><br><b>Error:</b> ${err.message}`, true);
+    setHint(`ERROR`, true);
   }
 
   async function generatePDF() {
